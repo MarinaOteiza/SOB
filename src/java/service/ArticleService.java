@@ -11,29 +11,37 @@ import jakarta.ws.rs.core.Response;
 import java.time.LocalDate;
 import java.util.List;
 import model.entities.Article;
-import model.entities.Topic;
 import model.entities.Customer;
 /**
  *
  * @author usuario
  */
-    public class ArticleService {
+    public class ArticleService extends AbstractFacade<Article>{
     @PersistenceContext(unitName = "Homework1PU")
     private EntityManager em;
+
+    public ArticleService() {
+        super(Article.class);
+    }
+
+    @Override
+    protected EntityManager getEntityManager() {
+        return em;
+    }
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Article> findByFilters(
-        @QueryParam("topic1") Topic topic1,
-        @QueryParam("topic2") Topic topic2, 
+        @QueryParam("topic1") String topic1,
+        @QueryParam("topic2") String topic2, 
         @QueryParam("author") String author) {
 
     // Construcción de la consulta dinámica
     StringBuilder queryString = new StringBuilder("SELECT a FROM Article a WHERE 1=1");
 
     // Condición para filtrar por topic1 y topic2 si están presentes
-    if (topic1 != null) {
+    if (topic1 != null && !topic1.isEmpty()) {
         queryString.append(" AND (a.category.name = :topic1");
-        if (topic2 != null) {
+        if (topic2 != null && !topic2.isEmpty()) {
             queryString.append(" OR a.category.name = :topic2");
         }
         queryString.append(")");
@@ -51,10 +59,10 @@ import model.entities.Customer;
     jakarta.persistence.Query query = em.createQuery(queryString.toString(), Article.class);
 
     // Asignar parámetros si están presentes
-    if (topic1 != null) {
+    if (topic1 != null && !topic1.isEmpty()) {
         query.setParameter("topic1", topic1);
     }
-    if (topic2 != null) {
+    if (topic2 != null && !topic2.isEmpty()) {
         query.setParameter("topic2", topic2);
     }
     if (author != null && !author.isEmpty()) {

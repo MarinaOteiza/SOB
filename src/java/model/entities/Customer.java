@@ -30,15 +30,12 @@ public class Customer implements Serializable {
    
     @ManyToMany
     private Article art;
-    // Constructor vacío
-    public Customer() {
-    }
 
     // Constructor con parámetros
-    public Customer(String username, String password, String email) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
+    public Customer(Customer c) {
+        this.username = c.getUsername();
+        this.password = c.getPassword();
+        this.email = c.getEmail();
     }
 
     // Getters y Setters

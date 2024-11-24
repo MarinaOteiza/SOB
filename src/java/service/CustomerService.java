@@ -1,137 +1,79 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package service;
+
+import authn.Secured;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.ws.rs.*;
+import jakarta.persistence.Query;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import model.entities.Article;
-import model.entities.Topic;
 import model.entities.Customer;
-/**
- *
- * @author usuario
- */
-public class CustomerService {
-      
+
+
+@Stateless
+@Path("/rest/api/v1/customer")
+public class CustomerService extends AbstractFacade<Customer> {
     @PersistenceContext(unitName = "Homework1PU")
     private EntityManager em;
+
+    public CustomerService() {
+        super(Customer.class);
+    }
+
+    @Override
+    protected EntityManager getEntityManager() {
+        return em;
+    }
+    
     @GET
-@Path("/rest/api/v1/customer")
-@Produces(MediaType.APPLICATION_JSON)
-public Response getAllCustomers(@HeaderParam("Authorization") String authToken) {
-    // Verificar si el usuario está autenticado
-    if (authToken == null || authToken.isEmpty() || !isUserAuthenticated(authToken)) {
-        return Response.status(Response.Status.FORBIDDEN)
-                .entity("You must be authenticated to access the customer list")
-                .build();
-    }
-
-    // Obtener todos los clientes
-    List<Customer> customers = em.createQuery("SELECT c FROM Customer c", Customer.class).getResultList();
-
-    // Crear la lista para devolver
-    List<Map<String, Object>> customersData = new ArrayList<>();
-
-    // Iterar sobre cada cliente
-    for (Customer customer : customers) {
-        Map<String, Object> customerData = new HashMap<>();
-        customerData.put("id", customer.getId());
-        customerData.put("name", customer.getUsername());
-        customerData.put("email", customer.getEmail());
-        // Aquí no incluimos la contraseña
-
-        // Verificar si el cliente es autor de algún artículo
-        List<Article> articles = em.createQuery("SELECT a FROM Article a WHERE a.author = :author", Article.class)
-                .setParameter("author", customer.getUsername())
-                .getResultList();
-
-        if (!articles.isEmpty()) {
-            // Si es autor, añadir el enlace al último artículo publicado
-            Article latestArticle = articles.get(articles.size() - 1); // El último artículo publicado
-            Map<String, String> links = new HashMap<>();
-            links.put("article", "/article/" + latestArticle.getId());
-            customerData.put("links", links);
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCustomers(){
+        List<Customer> customers = super.findAll();
+        List<Customer> customerDTOs = new LinkedList<Customer>();
+        for(Customer c : customers){
+            customerDTOs.add(new Customer(c));
         }
-
-        // Añadir los datos del cliente a la lista
-        customersData.add(customerData);
+        return Response.ok(customerDTOs).build();
     }
-
-    // Retornar la lista de clientes como respuesta
-    return Response.ok(customersData).build();
-}
-@GET
-@Path("/customer/{id}")
-@Produces(MediaType.APPLICATION_JSON)
-public Response getCustomerById(@PathParam("id") Long id, @HeaderParam("Authorization") String authToken) {
-    // Verificar si el usuario está autenticado
-    if (authToken == null || authToken.isEmpty() || !isUserAuthenticated(authToken)) {
-        return Response.status(Response.Status.FORBIDDEN)
-                .entity("You must be authenticated to access customer details")
-                .build();
+    
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCustomer(@PathParam("id") Long id){
+        Customer customer = em.find(Customer.class, id);
+        //Only 1 customer may be found with the ID.
+        if (customer!=null){
+            Customer customercopy = new Customer(customer);
+            return Response.status(Response.Status.OK).entity(customercopy).build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).entity("Customer with this id does not exist.").build();
     }
-
-    // Buscar el cliente por ID
-    Customer customer = em.find(Customer.class, id);
-    if (customer == null) {
-        return Response.status(Response.Status.NOT_FOUND)
-                .entity("Customer not found")
-                .build();
-    }
-
-    // Crear un mapa para retornar los datos del cliente
-    Map<String, Object> customerData = new HashMap<>();
-    customerData.put("id", customer.getId());
-    customerData.put("name", customer.getUsername());
-    customerData.put("email", customer.getEmail());
-    // No se incluye la contraseña
-
-    return Response.ok(customerData).build();
-}
-@PUT
-@Path("/customer/{id}")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-public Response updateCustomer(@PathParam("id") Long id, Customer updatedCustomer, @HeaderParam("Authorization") String authToken) {
-    // Verificar si el usuario está autenticado
-    if (authToken == null || authToken.isEmpty() || !isUserAuthenticated(authToken)) {
-        return Response.status(Response.Status.FORBIDDEN)
-                .entity("You must be authenticated to update customer data")
-                .build();
-    }
-
-    // Buscar el cliente por ID
-    Customer customer = em.find(Customer.class, id);
-    if (customer == null) {
-        return Response.status(Response.Status.NOT_FOUND)
-                .entity("Customer not found")
-                .build();
-    }
-
-    // Actualizar los datos del cliente
-    customer.setUsername(updatedCustomer.getUsername());
-    customer.setEmail(updatedCustomer.getEmail());
-    // Aquí podrías actualizar otros campos, pero no la contraseña
-
-    // Persistir los cambios
-    em.merge(customer);
-
-    return Response.status(Response.Status.NO_CONTENT).build();
-}
- // Método auxiliar para verificar la autenticación
-    private boolean isUserAuthenticated(String authToken) {
-        // Aquí se valida el token. Esto puede involucrar una llamada a un sistema de autenticación externo.
-        // Por simplicidad, asumimos que un token válido es "valid_token".
-        return "valid_token".equals(authToken);
+    
+    @PUT
+    @Path("/{id}")
+    @Secured
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response putCustomer(@PathParam("id") Long id, Customer c){
+        Customer customer = em.find(Customer.class, id);
+        if (customer==null){
+            //Control info provided, if new customer, password and username is required.
+            if(c.getPassword()==null || c.getUsername()==null){
+                return Response.status(Response.Status.BAD_REQUEST).entity("Missing necessary information to create customer.").build();
+            }else{
+                em.persist(c);
+            }
+        }else{
+            //Edit customer with provided info.
+            super.edit(c);
+        }
+        return Response.ok().entity(new Customer(c)).build();
     }
 }
