@@ -4,17 +4,24 @@
  */
 package model.entities;
 
+import authn.Credentials;
+import jakarta.persistence.Column;
 import java.io.Serializable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 
 @Entity
+@Table(name = "CUSTOMER", schema = "ROOT")
 @XmlRootElement
 public class Customer implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -24,19 +31,21 @@ public class Customer implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Customer_Gen")
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String username;
-    private String password;
-    private String email;
-   
-    @ManyToMany
-    private Article art;
 
-    // Constructor con parámetros
-    public Customer(Customer c) {
-        this.username = c.getUsername();
-        this.password = c.getPassword();
-        this.email = c.getEmail();
-    }
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
+    private String email;
+
+    @ManyToMany
+    private List<Article> art;
+
+    @OneToOne
+    @JoinColumn(name = "credentials_id", referencedColumnName = "id")
+    private Credentials credentials;
 
     // Getters y Setters
     public Long getId() {
@@ -69,6 +78,14 @@ public class Customer implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Credentials getCredentials() {
+        return credentials;
+    }
+
+    public void setCredentials(Credentials credentials) {
+        this.credentials = credentials;
     }
 
     @Override

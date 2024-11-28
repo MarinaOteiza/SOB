@@ -1,12 +1,16 @@
 package model.entities;
 
+import jakarta.persistence.Column;
 import java.io.Serializable;
 import java.time.LocalDate;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
@@ -22,29 +26,32 @@ public class Article implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Article_Gen")
     private Long id;
     
+    @Column(nullable = false)
     private String title;
     private String author;
+    
+    @Column(length = 500)
     private String summary; // Expected to be trimmed to 20 words
     private LocalDate publicationDate;
     private double views; // Views stored as double to support abbreviations like 3.3k
     private String featuredImageUrl;
     private boolean priv;
-     
-    @ManyToMany
-    private Topic topic1;
-    private Topic topic2;
-    // Getters and Setters
-      public List<Topic> getTopic() {
-    List<Topic> l = new ArrayList<>();
-    l.add(topic1);
-    l.add(topic2);
-    return l;
-}
-       public void setTopic(Topic topic1, Topic topic2) {
-          this.topic1=topic1;
-          this.topic2=topic2;
-}
     
+    @ManyToMany // Updated: Many-to-Many relationship with `Topic`
+    @JoinTable(
+        name = "ARTICLE_TOPIC", // Join table for Article <-> Topic
+        joinColumns = @JoinColumn(name = "ARTICLE_ID"),
+        inverseJoinColumns = @JoinColumn(name = "TOPIC_ID")
+    )
+    private List<Topic> topics=new ArrayList<>();
+    // Getters and Setters
+    public List<Topic> getTopic() {
+        return topics;
+    }
+    public void setTopics(Topic topic1, Topic topic2) {
+       topics.add(topic1);
+       topics.add(topic2);
+    }
     
     public void setId(Long id) {
         this.id = id;
@@ -83,7 +90,16 @@ public class Article implements Serializable {
     }
 
     public void setSummary(String summary) {
-        this.summary = summary;
+        if (summary != null) {
+            String[] words = summary.split("\\s+");
+            if (words.length > 20) {
+                this.summary = String.join(" ", List.of(words).subList(0, 20)) + "...";
+            } else {
+                this.summary = summary;
+            }
+        } else {
+            this.summary = null;
+        }
     }
 
     public LocalDate getPublicationDate() {

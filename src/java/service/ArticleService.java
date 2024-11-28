@@ -16,6 +16,7 @@ import model.entities.Customer;
  *
  * @author usuario
  */
+    @Path("/article")
     public class ArticleService extends AbstractFacade<Article>{
     @PersistenceContext(unitName = "Homework1PU")
     private EntityManager em;

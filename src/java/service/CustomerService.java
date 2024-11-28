@@ -19,7 +19,7 @@ import model.entities.Customer;
 
 
 @Stateless
-@Path("/rest/api/v1/customer")
+@Path("/customer")
 public class CustomerService extends AbstractFacade<Customer> {
     @PersistenceContext(unitName = "Homework1PU")
     private EntityManager em;
@@ -65,13 +65,14 @@ public class CustomerService extends AbstractFacade<Customer> {
         Customer customer = em.find(Customer.class, id);
         if (customer==null){
             //Control info provided, if new customer, password and username is required.
-            if(c.getPassword()==null || c.getUsername()==null){
+            if(c.getPassword()==null || c.getUsername()==null|| c.getEmail() == null){
                 return Response.status(Response.Status.BAD_REQUEST).entity("Missing necessary information to create customer.").build();
             }else{
                 em.persist(c);
             }
         }else{
             //Edit customer with provided info.
+            c.setId(id);
             super.edit(c);
         }
         return Response.ok().entity(new Customer(c)).build();
