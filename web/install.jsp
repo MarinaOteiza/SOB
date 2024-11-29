@@ -38,7 +38,7 @@
             String data[] = new String[]{
                 "INSERT INTO " + schema + ".TOPIC VALUES (NEXT VALUE FOR TOPIC_GEN, 'Computer Science')",
                 "INSERT INTO " + schema + ".CREDENTIALS VALUES (NEXT VALUE FOR CREDENTIALS_GEN, 'sob', 'sob')",
-                "INSERT INTO " + schema + ".CUSTOMER VALUES (NEXT VALUE FOR CUSTOMER_GEN, 'sob', 'sob', 'sob@example.com')",
+                "INSERT INTO " + schema + ".CUSTOMER VALUES (NEXT VALUE FOR CUSTOMER_GEN, 'sob2', 'sob2', 'sob@example.com')",
                 "INSERT INTO " + schema + ".CUSTOMER VALUES (NEXT VALUE FOR CUSTOMER_GEN, 'user2', 'password2', 'user2@example.com')",
                 "INSERT INTO " + schema + ".ARTICLE VALUES (NEXT VALUE FOR ARTICLE_GEN, 'Introducción a la Programación', 'Contenido sobre conceptos básicos de programación', 'John Doe', CURRENT_TIMESTAMP)",
                 "INSERT INTO " + schema + ".ARTICLE VALUES (NEXT VALUE FOR ARTICLE_GEN, 'Avances en Inteligencia Artificial', 'Artículo sobre las últimas tendencias en IA', 'Jane Smith', CURRENT_TIMESTAMP)"

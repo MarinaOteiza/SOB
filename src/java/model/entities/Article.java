@@ -12,22 +12,26 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
 @XmlRootElement
+@Entity
+@Table(name="ARTICLE")
 public class Article implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @SequenceGenerator(name = "Article_Gen", allocationSize = 1)
+    @SequenceGenerator(name = "Article_Gen", sequenceName = "ARTICLE_GEN", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Article_Gen")
     private Long id;
     
     @Column(nullable = false)
     private String title;
+    
+    @Column(nullable = false)
     private String author;
     
     @Column(length = 500)

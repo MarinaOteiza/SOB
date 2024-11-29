@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model.entities;
 
 import authn.Credentials;
@@ -20,9 +16,9 @@ import jakarta.persistence.Table;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
-@Entity
-@Table(name = "CUSTOMER", schema = "ROOT")
 @XmlRootElement
+@Entity
+@Table(name = "CUSTOMER")
 public class Customer implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -47,6 +43,19 @@ public class Customer implements Serializable {
     @JoinColumn(name = "credentials_id", referencedColumnName = "id")
     private Credentials credentials;
 
+    public Customer() {
+    }
+    public Customer(String username, String password, String email, List<Article> art){
+        this.username=username;
+        this.password=password;
+        this.email=email;
+        this.art=art;
+    }
+    public Customer(Customer c) {
+        this.username = c.getUsername();
+        this.password = c.getPassword();
+        this.email = c.getEmail();
+    }
     // Getters y Setters
     public Long getId() {
         return id;
@@ -86,6 +95,20 @@ public class Customer implements Serializable {
 
     public void setCredentials(Credentials credentials) {
         this.credentials = credentials;
+    }
+    
+        public boolean isAuthor() {
+        // El usuario es autor si tiene artículos asociados
+        return art != null && !art.isEmpty();
+    }
+
+    public String getArticleLink() {
+        // Si el usuario es autor y tiene artículos, devolver el enlace al último artículo
+        if (isAuthor()) {
+            Article lastArticle = art.get(art.size() - 1);  // Último artículo de la lista
+            return "/article/" + lastArticle.getId(); // Suponiendo que Article tiene un método getId()
+        }
+        return null;  // Si no es autor, no se proporciona el enlace
     }
 
     @Override

@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Credentials implements Serializable { 
     @Id
-    @SequenceGenerator(name="Credentials_Gen", allocationSize=1)
+    @SequenceGenerator(name="Credentials_Gen", sequenceName = "CREDENTIALS_GEN", allocationSize=1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Credentials_Gen") 
     private Long id;
     @Column(unique=true)
