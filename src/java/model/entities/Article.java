@@ -41,21 +41,18 @@ public class Article implements Serializable {
     private String featuredImageUrl;
     private boolean priv;
     
-    @ManyToMany // Updated: Many-to-Many relationship with `Topic`
-    @JoinTable(
-        name = "ARTICLE_TOPIC", // Join table for Article <-> Topic
-        joinColumns = @JoinColumn(name = "ARTICLE_ID"),
-        inverseJoinColumns = @JoinColumn(name = "TOPIC_ID")
-    )
-    private List<Topic> topics=new ArrayList<>();
+    @ManyToMany(mappedBy = "articles")
+    
+    //private List<Topic> topics = new ArrayList<>();
+    
     // Getters and Setters
-    public List<Topic> getTopic() {
-        return topics;
-    }
-    public void setTopics(Topic topic1, Topic topic2) {
-       topics.add(topic1);
-       topics.add(topic2);
-    }
+//    public List<Topic> getTopic() {
+//        return topics;
+//    }
+//    public void setTopics(Topic topic1, Topic topic2) {
+//       topics.add(topic1);
+//       topics.add(topic2);
+//    }
     
     public void setId(Long id) {
         this.id = id;

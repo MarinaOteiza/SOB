@@ -10,8 +10,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
+import java.util.List;
 
 @XmlRootElement
 @Entity
@@ -22,7 +27,13 @@ public class Topic implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Topic_Gen") 
     private Long id;
     private String name;
-
+    @ManyToMany // Updated: Many-to-Many relationship with Topic
+    @JoinTable(
+        name = "ARTICLE_TOPIC", // Join table for Article <-> Topic
+        joinColumns = @JoinColumn(name = "ARTICLE_ID"),
+        inverseJoinColumns = @JoinColumn(name = "TOPIC_ID"))
+    
+    //private List<Article> articles = new ArrayList<>();
     public String getName() {
         return name;
     }
