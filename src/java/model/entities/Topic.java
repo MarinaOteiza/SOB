@@ -33,7 +33,8 @@ public class Topic implements Serializable {
         joinColumns = @JoinColumn(name = "ARTICLE_ID"),
         inverseJoinColumns = @JoinColumn(name = "TOPIC_ID"))
     
-    //private List<Article> articles = new ArrayList<>();
+    private List<Article> articles = new ArrayList<>();
+    
     public String getName() {
         return name;
     }
@@ -73,6 +74,10 @@ public class Topic implements Serializable {
     @Override
     public String toString() {
         return "model.entities.Topic[ id=" + id + " ]";
+    }
+
+    Object getArticles() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     
 }

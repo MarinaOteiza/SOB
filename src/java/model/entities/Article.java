@@ -42,18 +42,7 @@ public class Article implements Serializable {
     private boolean priv;
     
     @ManyToMany(mappedBy = "articles")
-    
-    //private List<Topic> topics = new ArrayList<>();
-    
-    // Getters and Setters
-//    public List<Topic> getTopic() {
-//        return topics;
-//    }
-//    public void setTopics(Topic topic1, Topic topic2) {
-//       topics.add(topic1);
-//       topics.add(topic2);
-//    }
-    
+
     public void setId(Long id) {
         this.id = id;
     }
