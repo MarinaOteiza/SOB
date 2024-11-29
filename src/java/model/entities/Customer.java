@@ -39,9 +39,9 @@ public class Customer implements Serializable {
     @ManyToMany
     private List<Article> art;
 
-    @OneToOne
-    @JoinColumn(name = "credentials_id", referencedColumnName = "id")
-    private Credentials credentials;
+    //@OneToOne
+    //@JoinColumn(name = "credentials_id", referencedColumnName = "id")
+    //private Credentials credentials;
 
     public Customer() {
     }
@@ -88,16 +88,8 @@ public class Customer implements Serializable {
     public void setEmail(String email) {
         this.email = email;
     }
-
-    public Credentials getCredentials() {
-        return credentials;
-    }
-
-    public void setCredentials(Credentials credentials) {
-        this.credentials = credentials;
-    }
     
-        public boolean isAuthor() {
+    public boolean isAuthor() {
         // El usuario es autor si tiene artículos asociados
         return art != null && !art.isEmpty();
     }
