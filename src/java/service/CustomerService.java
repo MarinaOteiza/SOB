@@ -15,6 +15,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.LinkedList;
 import java.util.List;
+import model.entities.Article;
 import model.entities.Customer;
 
 
@@ -34,25 +35,42 @@ public class CustomerService extends AbstractFacade<Customer> {
     }
     
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getCustomers(){
-        List<Customer> customers = super.findAll();
-        List<Customer> customerDTOs = new LinkedList<Customer>();
-        for(Customer c : customers){
-            customerDTOs.add(new Customer(c));
+@Produces(MediaType.APPLICATION_JSON)
+public Response getCustomers(){
+    List<Customer> customers = super.findAll();  // Obtén todos los customers
+    List<Customer> customerDTO = new LinkedList<Customer>();  // Cambiar a CustomerDTO para manejar el artículo
+    
+    for (Customer c : customers) {
+        // Crear un DTO de Customer
+        Customer customerCopy = new Customer();
+        customerCopy.setId(c.getId());
+        customerCopy.setUsername(c.getUsername());
+        customerCopy.setEmail(c.getEmail());
+
+        // Verificar si es autor
+        if (c.isAuthor()) {
+            // Obtener el último artículo si es autor
+            c.getArticleLink();
         }
-        return Response.ok(customerDTOs).build();
+        
+        customerDTO.add(customerCopy);  // Añadir el DTO a la lista
     }
+
+    return Response.ok(customerDTO).build();  // Devolver los DTOs
+}
     
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCustomer(@PathParam("id") Long id){
-        Customer customer = em.find(Customer.class, id);
+        Customer c = em.find(Customer.class, id);
         //Only 1 customer may be found with the ID.
-        if (customer!=null){
-            Customer customercopy = new Customer(customer);
-            return Response.status(Response.Status.OK).entity(customercopy).build();
+        if (c!=null){
+           Customer customerCopy= new Customer();
+           customerCopy.setId(c.getId());
+           customerCopy.setUsername(c.getUsername());
+           customerCopy.setEmail(c.getEmail());
+            return Response.status(Response.Status.OK).entity(customerCopy).build();
         }
         return Response.status(Response.Status.NOT_FOUND).entity("Customer with this id does not exist.").build();
     }
@@ -65,7 +83,7 @@ public class CustomerService extends AbstractFacade<Customer> {
         Customer customer = em.find(Customer.class, id);
         if (customer==null){
             //Control info provided, if new customer, password and username is required.
-            if(c.getPassword()==null || c.getUsername()==null){
+            if(c.getCredentials().getPassword()==null || c.getUsername()==null){
                 return Response.status(Response.Status.BAD_REQUEST).entity("Missing necessary information to create customer.").build();
             }else{
                 em.persist(c);
@@ -74,6 +92,11 @@ public class CustomerService extends AbstractFacade<Customer> {
             //Edit customer with provided info.
             super.edit(c);
         }
-        return Response.ok().entity(new Customer(c)).build();
+        Customer customerCopy= new Customer();
+        customerCopy.setUsername(c.getUsername());
+        customerCopy.setEmail(c.getEmail());
+        customerCopy.getCredentials().setPassword(c.getCredentials().getPassword());
+        customerCopy.getCredentials().setUsername(customerCopy.getUsername());
+        return Response.ok().entity(customerCopy).build();
     }
 }

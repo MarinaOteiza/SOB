@@ -1,6 +1,7 @@
 package model.entities;
 
 import authn.Credentials;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import java.io.Serializable;
 import jakarta.persistence.Entity;
@@ -8,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -15,6 +17,7 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import java.util.List;
+import model.entities.Customer; 
 
 @XmlRootElement
 @Entity
@@ -31,32 +34,22 @@ public class Customer implements Serializable {
     private String username;
 
     @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false)
     private String email;
 
-    @ManyToMany
+//    @OneToMany(mappedBy = "customer", cascade = CascadeType.PERSIST)
     private List<Article> art;
 
-    //@OneToOne
-    //@JoinColumn(name = "credentials_id", referencedColumnName = "id")
-    //private Credentials credentials;
-
-    public Customer() {
-    }
-    public Customer(String username, String password, String email, List<Article> art){
-        this.username=username;
-        this.password=password;
-        this.email=email;
-        this.art=art;
-    }
-    public Customer(Customer c) {
-        this.username = c.getUsername();
-        this.password = c.getPassword();
-        this.email = c.getEmail();
-    }
+    @OneToOne
+    @JoinColumn(name = "credentials_id", referencedColumnName = "id")
+    private Credentials credentials;
+ 
     // Getters y Setters
+    public Credentials getCredentials(){
+        return credentials;
+    }
+    public void setCredentials( Credentials credentials){
+        this.credentials=credentials;
+    }
     public Long getId() {
         return id;
     }
@@ -71,14 +64,6 @@ public class Customer implements Serializable {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getEmail() {
