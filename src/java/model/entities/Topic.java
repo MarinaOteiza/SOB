@@ -13,13 +13,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.NamedQuery;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @XmlRootElement
 @Entity
+@NamedQuery(
+    name = "Topic.existsByName",
+    query = "SELECT COUNT(t) FROM Topic t WHERE t.name = :name"
+)
 public class Topic implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -34,7 +40,7 @@ public class Topic implements Serializable {
         inverseJoinColumns = @JoinColumn(name = "TOPIC_ID"))
     
     private List<Article> articles = new ArrayList<>();
-    
+   
     public String getName() {
         return name;
     }

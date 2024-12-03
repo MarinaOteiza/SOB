@@ -5,6 +5,7 @@
 package service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -77,7 +78,7 @@ import model.entities.Customer;
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response findById(
+    public Response findArticleById(
             @PathParam("id") Long id,
             @HeaderParam("Authorization") String authToken) {
 
@@ -151,7 +152,8 @@ import model.entities.Customer;
     @Produces(MediaType.APPLICATION_JSON)
     public Response createArticle(
         @HeaderParam("Authorization") String authToken,
-        Article article) {
+        Article article, @QueryParam("topic1") String topic1,
+        @QueryParam("topic2") String topic2) {
 
     // Verificar si el usuario está autenticado
     if (authToken == null || authToken.isEmpty() || !isUserAuthenticated(authToken)) {
@@ -161,8 +163,23 @@ import model.entities.Customer;
     }
 
     // Validar los tópicos
-    
-
+    if (topic1==null){
+        return Response.status(Response.Status.FORBIDDEN)
+                .entity("Articles must include at least one topic")
+                .build();
+    }else{
+        if(!topicExist(topic1)){
+            return Response.status(Response.Status.FORBIDDEN)
+                .entity("Topic1 are not allowed")
+                .build();
+        }
+        if (topic2!=null && !topicExist(topic2)){
+            return Response.status(Response.Status.FORBIDDEN)
+                .entity("Topic2 are not allowed")
+                .build();
+        }
+        
+    }
     // Determinar la fecha de publicación automáticamente
     article.setPublicationDate(LocalDate.now());
 
@@ -211,5 +228,12 @@ import model.entities.Customer;
         return "author_name";  // Cambia esto por la lógica real de extracción de usuario desde el token.
     }
     return null;
-}
+    }
+    public boolean topicExist(String topicName) {
+        TypedQuery<Long> query = em.createNamedQuery("Topic.existsByName", Long.class);
+        query.setParameter("name", topicName);
+        Long count = query.getSingleResult();
+        return count > 0;
+    }
+
 }
