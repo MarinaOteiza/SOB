@@ -33,13 +33,13 @@ public class Topic implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Topic_Gen") 
     private Long id;
     private String name;
-    @ManyToMany // Updated: Many-to-Many relationship with Topic
-    @JoinTable(
-        name = "ARTICLE_TOPIC", // Join table for Article <-> Topic
-        joinColumns = @JoinColumn(name = "ARTICLE_ID"),
-        inverseJoinColumns = @JoinColumn(name = "TOPIC_ID"))
+//    @ManyToMany // Updated: Many-to-Many relationship with Topic
+//    @JoinTable(
+//        name = "ARTICLE_TOPIC", // Join table for Article <-> Topic
+//        joinColumns = @JoinColumn(name = "ARTICLE_ID"),
+//        inverseJoinColumns = @JoinColumn(name = "TOPIC_ID"))
     
-    private List<Article> articles = new ArrayList<>();
+//    private List<Article> articles = new ArrayList<>();
    
     public String getName() {
         return name;
@@ -81,9 +81,4 @@ public class Topic implements Serializable {
     public String toString() {
         return "model.entities.Topic[ id=" + id + " ]";
     }
-
-    Object getArticles() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-    
 }

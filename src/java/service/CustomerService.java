@@ -48,9 +48,8 @@ public Response getCustomers(){
         customerCopy.setEmail(c.getEmail());
 
         // Verificar si es autor
-        if (c.isAuthor()) {
-            // Obtener el último artículo si es autor
-            c.getArticleLink();
+        if (isAuthor(c.getId())) {
+            customerCopy.setArticleLink(c.getLink());
         }
         
         customerDTO.add(customerCopy);  // Añadir el DTO a la lista
@@ -70,7 +69,7 @@ public Response getCustomers(){
            customerCopy.setId(c.getId());
            customerCopy.setUsername(c.getUsername());
            customerCopy.setEmail(c.getEmail());
-            return Response.status(Response.Status.OK).entity(customerCopy).build();
+           return Response.status(Response.Status.OK).entity(customerCopy).build();
         }
         return Response.status(Response.Status.NOT_FOUND).entity("Customer with this id does not exist.").build();
     }
@@ -99,4 +98,24 @@ public Response getCustomers(){
         customerCopy.getCredentials().setUsername(customerCopy.getUsername());
         return Response.ok().entity(customerCopy).build();
     }
+    
+        public boolean isAuthor(Long id) {
+            boolean isAuthor = false;
+
+            try {
+                // Consulta para verificar si el id está presente en la tabla CUSTOMER_ARTICLE
+                String jpql = "SELECT COUNT(ca) FROM CustomerArticle ca WHERE ca.customerId = :id";
+                Query query = em.createQuery(jpql);
+                query.setParameter("id", id);
+
+                // Obtener el resultado de la consulta
+                Long count = (Long) query.getSingleResult();
+                if (count != null && count > 0) {
+                    isAuthor = true;
+                }
+            } catch (Exception e) {
+                e.printStackTrace(); // Manejo básico de excepciones; puedes mejorarlo
+            }
+            return isAuthor;
+        }
 }

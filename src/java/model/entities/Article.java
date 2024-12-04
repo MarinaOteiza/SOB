@@ -42,12 +42,16 @@ public class Article implements Serializable {
     private double views; // Views stored as double to support abbreviations like 3.3k
     private String featuredImageUrl;
     private boolean priv;
-    
-    @ManyToMany(mappedBy = "articles")
+//    
+//    @ManyToMany(mappedBy = "articles")
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "customer_id", nullable = false)
-//    private Customer customer;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
+    
+    @ManyToMany
+    @JoinColumn(name = "TOPICS_id", referencedColumnName = "id")
+    private List<Topic> topic;
 
     public void setId(Long id) {
         this.id = id;

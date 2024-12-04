@@ -39,8 +39,6 @@
             String data[] = new String[]{
                 "INSERT INTO " + schema + ".TOPIC VALUES (NEXT VALUE FOR TOPIC_GEN, 'Computer Science')",
                 "INSERT INTO " + schema + ".CREDENTIALS VALUES (NEXT VALUE FOR CREDENTIALS_GEN, 'sob', 'sob')",
-                "INSERT INTO " + schema + ".ARTICLE VALUES (NEXT VALUE FOR ARTICLE_GEN, 'sob', 'url',0, '" + java.sql.Date.valueOf(LocalDate.now()) + "', '...', 'Introducción a la Programación', 0)",  
-                "INSERT INTO " + schema + ".ARTICLE_TOPIC (TOPIC_ID, ARTICLE_ID) VALUES (1, 1)"
             };  
             for (String datum : data) {
                 if (stmt.executeUpdate(datum)<=0) {
@@ -59,6 +57,20 @@
             String insertCommentSQL1 = "INSERT INTO " + schema + ".CUSTOMER VALUES (NEXT VALUE FOR CUSTOMER_GEN, 'sob@example.com', 'sob', " + customerid1 + ")";
             stmt.executeUpdate(insertCommentSQL1);
             out.println("<pre> -> " + insertCommentSQL1 + "</pre>");
+            
+            String identityQuery2 = "SELECT id FROM " + schema + ".CUSTOMER WHERE username = 'sob'";
+            ResultSet rs2 = stmt.executeQuery(identityQuery2);
+            Long customerid2 = null;
+            if (rs2.next()) 
+                customerid2 = rs2.getLong(1);
+            
+            String insertCommentSQL2 = "INSERT INTO " + schema + ".ARTICLE VALUES (NEXT VALUE FOR ARTICLE_GEN, 'sob', 'url',0, '" + java.sql.Date.valueOf(LocalDate.now()) + "', '...', 'Introducción a la Programación', 0,  " + customerid2 + ")";
+            stmt.executeUpdate(insertCommentSQL2);
+            out.println("<pre> -> " + insertCommentSQL2 + "</pre>");
+            
+            String insertCommentSQL3 = "INSERT INTO " + schema + ".ARTICLE_TOPIC (TOPIC_ID, ARTICLE_ID) VALUES (1,  1)";
+            stmt.executeUpdate(insertCommentSQL3);
+            out.println("<pre> -> " + insertCommentSQL3 + "</pre>");
         %>
         <button onclick="window.location='<%=request.getSession().getServletContext().getContextPath()%>'">Go home</button>
     </body>
